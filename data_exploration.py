@@ -1,5 +1,4 @@
 import xml.etree.ElementTree as et
-from typing import Optional
 
 
 xml_data_path = "./data/pubmed_result_sjogren.xml"
@@ -15,6 +14,9 @@ articles = pubmed_xml_root.findall("./PubmedArticle")
 articles_count = len(articles)
 print(articles_count)
 
+#Keywords:
+#Mesh - Medical Subject Headline
+#GRID - Global Research Identifier Database
 
 def extract_article_data(article_no: int, root: et.Element) -> dict[str]:
     """Extracts article data, from xml file given an article number
@@ -36,8 +38,8 @@ def extract_article_data(article_no: int, root: et.Element) -> dict[str]:
     pmid = article.find('.//PMID').text
     year = article.find(".//PubDate/Year").text
     keyword_list = [keyword.text for keyword in article.findall('.//Keyword')]
-    mesh_list = [descriptor.get('UI') for descriptor in article.findall(".//MeshHeading/DescriptorName")]
-    
+    mesh_list = [desc.get('UI') for desc in article.findall(".//MeshHeading/DescriptorName")]
+
     return {
         "title": title,
         "pmid": pmid,
@@ -46,3 +48,37 @@ def extract_article_data(article_no: int, root: et.Element) -> dict[str]:
         "mesh_list": mesh_list
     }
 
+
+def extract_author_data(article_no: int, author_no: int, root: et.Element)-> dict[str]:
+    """Extracts author's data based on article number and author number
+
+    Args:
+        article_no (int): Index of article in XML File
+        author_no (int): Index of author in XML File
+        root (et.Element): Root element of XML Tree
+
+    Returns:
+        dict[str]: Dictionary containing author details:
+         - 'forename' (str): Forename of author
+         - 'lastname' (str): Lastname of author
+         - 'initials' (str): Initials of Author
+         - 'identifier' (str): Unique ID from Global Research Identifier Database
+         - 'affiliation' (List[str]): List of Affiliations
+    """
+    author = root[article_no].findall('.//AuthorList/Author')[author_no]
+    first_name = author.find('.//ForeName').text
+    last_name = author.find('.//LastName').text
+    initials = author.find('.//Initials').text
+    grid_identity = author.find(".//Identifier[@Source='GRID']").text
+    affiliation_list = [affiliation.text for affiliation in author.findall('.//Affiliation')]
+
+    return {
+        'forename': first_name,
+        'lastname': last_name,
+        'initials': initials,
+        'identifier': grid_identity,
+        'affiliation': affiliation_list
+    }
+
+print(extract_article_data(23, pubmed_xml_root))
+print(extract_author_data(208,0,pubmed_xml_root))
