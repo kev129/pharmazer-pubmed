@@ -15,16 +15,6 @@ articles = pubmed_xml_root.findall("./PubmedArticle")
 articles_count = len(articles)
 print(articles_count)
 
-def get_element_text(element: et.Element) ->Optional[str]:
-    """Gets the text content of the given XML element
-
-    Args:
-        element (Element): XML Element that contains text to be retrieved
-
-    Returns:
-        Optional[Element]: Text content, or none if not available
-    """
-    return element.text or 'None'
 
 def extract_article_data(article_no: int, root: et.Element) -> dict[str]:
     """Extracts article data, from xml file given an article number
@@ -55,3 +45,4 @@ def extract_article_data(article_no: int, root: et.Element) -> dict[str]:
         "keyword_list": keyword_list,
         "mesh_list": mesh_list
     }
+
